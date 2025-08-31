@@ -1,46 +1,74 @@
-from typing import Any
-import random
+import json
+import os
 
+from dotenv import load_dotenv
+from yahoo_oauth import OAuth2
+import yahoo_fantasy_api.league as yfl
+import yahoo_fantasy_api.team as yft
 from mcp.server.fastmcp import FastMCP
 
 
 mcp = FastMCP(
-    name='yahoo-fantasy-helper',
-    stateless_http=True,
+    name='yahoo-fantasy-helper'
 )
 
 
-@mcp.tool()
-def hello_tool(input: str) -> str:
-    """A playful greeting tool that echoes messages with fun additions.
-    
-    Use for casual greetings, testing tool functionality, or adding whimsy to conversations. 
-    Adds 'Hello,' prefix, 'foo foo!' suffix, and a random number between 1-102.
-    """
-    num = random.randint(1, 100)
-    return f"Hello, {input} foo foo! {num}"
+# Load environment variables from .env file
+load_dotenv()
+oauth_path = os.getenv("OAUTH2_PATH") or "./oauth2.json"
+if not os.path.exists(oauth_path):
+    raise RuntimeError(
+        f"OAuth2 credentials file not found at '{oauth_path}'. "
+        "Set OAUTH2_PATH in your .env or place oauth2.json in the project root."
+    )
+
+oauth = OAuth2(None, None, from_file=oauth_path)
+if not oauth.token_is_valid():
+    oauth.refresh_access_token()
+
+
+# Load league and team IDs from environment variables
+league_id = os.getenv("LEAGUE_ID")
+team_id = os.getenv("TEAM_ID")
+
 
 @mcp.tool()
-def get_available_players(league_id: str) -> str:
-    """Checks Yahoo Fantasy API to see what players are available for drafting."""
-    # Simulate fetching available players
-    available_players = ["Player D", "Player E", "Player F"]
-    return f"Available players in league {league_id}: {', '.join(available_players)}"
-
-@mcp.tool()
-def get_team_roster(league_id: str, team_id: str) -> str:
+def get_my_team_roster(team_id: str = team_id) -> str:
     """Checks Yahoo Fantasy API to see what players are on a specific team's roster."""
-    # Simulate fetching team roster
-    team_roster = ["Player A", "Player B", "Player C"]
-    return f"Roster for team {team_id} in league {league_id}: {', '.join(team_roster)}"
+    try:
+        team = yft.Team(oauth, team_id)
+        roster = team.roster()
+        filtered = [
+            {
+                "name": p["name"],
+                "eligible_positions": p.get("eligible_positions", [])
+            }
+            for p in roster
+            if "name" in p
+        ]
+        return json.dumps(filtered)
+    except Exception as e:
+        return json.dumps({"error": f"Error fetching team roster: {e}"})
+
 
 @mcp.tool()
-def get_player_stats(player_id: str) -> str:
-    """Fetches available stats for a specific player."""
-
-@mcp.tool()
-def get_player_project_weekly_stats(player_id: str) -> str:
-    """Fetches projected weekly stats for a specific player."""
+def get_drafted_players(league_id: str = league_id) -> str:
+    """Checks Yahoo Fantasy API to see what players have been drafted in a specific league."""
+    try:
+        league = yfl.League(oauth, league_id)
+        drafted_players = league.taken_players()
+        filtered = [
+            {
+                "name": p.get("name", ""),
+                "eligible_positions": p.get("eligible_positions", []),
+                "percent_owned": p.get("percent_owned", None)
+            }
+            for p in drafted_players
+            if "name" in p
+        ]
+        return json.dumps(filtered)
+    except Exception as e:
+        return json.dumps({"error": f"Error fetching drafted players: {e}"})
 
 
 # run server
