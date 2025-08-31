@@ -80,3 +80,4 @@ local-mcp-servers/
 
 * Currently using stdio (standard input/output) for connection, want to consider a different setup using HTTP, WebSocket, or other protocols.
 * Think about where / if I want to store Claude desktop configuration files for easier management and version control.
+* I need to adjust how I assign leage id and team id to tools, right now I set variables in the script and pass them as arg defaults. Not great, a quick fix to get it working.
