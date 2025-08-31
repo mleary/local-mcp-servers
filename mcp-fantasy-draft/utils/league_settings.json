@@ -1,0 +1,126 @@
+{
+    "roster_positions": {
+        "offense": ["QB", "WR", "WR", "WR", "RB", "RB", "TE", "W/R/T", "Q/W/R/T", "K"],
+        "defense": ["D", "DB", "DB", "LB", "LB"],
+        "bench": ["BN", "BN", "BN", "BN", "BN", "BN", "BN", "BN", "BN", "BN", "BN", "BN", "BN", "BN", "IR", "IR"]
+    },
+  "offense": {
+    "passing_attempts": 0.3,
+    "completions": 0.8,
+    "incompletions": -0.4,
+    "passing_yards": {
+      "yards_per_point": 25,
+      "bonus_300": 1,
+      "bonus_400": 5,
+      "bonus_500": 7
+    },
+    "passing_tds": 6,
+    "interceptions": -2,
+    "sacks": -1,
+    "rushing_attempts": 0.7,
+    "rushing_yards": {
+      "yards_per_point": 7,
+      "bonus_100": 1,
+      "bonus_150": 4,
+      "bonus_200": 8
+    },
+    "rushing_tds": 6,
+    "receptions": 1.5,
+    "receiving_yards": {
+      "yards_per_point": 7,
+      "bonus_100": 1,
+      "bonus_150": 4,
+      "bonus_200": 8
+    },
+    "receiving_tds": 6,
+    "return_yards": {
+      "yards_per_point": 1.8,
+      "bonus_75": 3,
+      "bonus_100": 4,
+      "bonus_137": 7
+    },
+    "return_tds": 6,
+    "two_point_conversions": 2,
+    "fumbles": -1,
+    "offensive_fumble_return_td": 6,
+    "pick_six_thrown": -4,
+    "bonus_40yd_completion": 1,
+    "bonus_40yd_pass_td": 2,
+    "bonus_40yd_run": 1,
+    "bonus_40yd_rush_td": 3,
+    "bonus_40yd_reception": 0.5,
+    "bonus_40yd_rec_td": 2,
+    "rushing_first_down": 1
+  },
+  "kickers": {
+    "fg_0_19": 3,
+    "fg_20_29": 3.5,
+    "fg_30_39": 6,
+    "fg_40_49": 8,
+    "fg_50_plus": 12,
+    "fg_miss_0_19": -15,
+    "fg_miss_20_29": -5,
+    "fg_miss_30_39": -3,
+    "fg_miss_40_49": -2,
+    "fg_miss_50_plus": -1,
+    "pat_made": 1,
+    "pat_missed": -2,
+    "fg_total_yards": {
+      "yards_per_point": 10
+    }
+  },
+  "defense_team": {
+    "sack": 1,
+    "interception": 2,
+    "fumble_recovery": 2,
+    "td": 6,
+    "safety": 2,
+    "block_kick": 8,
+    "return_yards": {
+      "yards_per_point": 100,
+      "bonus_75": 3,
+      "bonus_100": 4,
+      "bonus_150": 5
+    },
+    "return_td": 6,
+    "points_allowed": {
+      "0": 25,
+      "1_6": 20,
+      "7_13": 15,
+      "14_20": 10,
+      "21_27": 5,
+      "28_34": 0,
+      "35_plus": -5
+    },
+    "fourth_down_stop": 1,
+    "tackle_for_loss": 0.6,
+    "yards_allowed": {
+      "negative": 25,
+      "0_99": 15,
+      "100_199": 10,
+      "200_299": 5,
+      "300_399": 0,
+      "400_499": -4,
+      "500_plus": -10
+    },
+    "three_and_outs": 1,
+    "extra_point_returned": 6
+  },
+  "idp": {
+    "tackle_solo": 1.9,
+    "tackle_assist": 0.85,
+    "sack": 5,
+    "interception": 8,
+    "fumble_force": 1,
+    "fumble_recovery": 2,
+    "td": 6,
+    "safety": 2,
+    "pass_defended": 8,
+    "block_kick": 10,
+    "tackle_for_loss": 6,
+    "turnover_return_yards": {
+      "yards_per_point": 10
+    },
+    "extra_point_returned": 2
+  }
+}
