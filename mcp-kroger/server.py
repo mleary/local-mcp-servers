@@ -13,7 +13,6 @@ load_dotenv()
 
 # Configuration
 STORE_ID = os.getenv("KROGER_STORE_ID", "70100146")  # Default store ID
-CONTEXT_FILE_PATH = os.getenv("CONTEXT_FILE_PATH", "./grocery_context.json")
 
 # Mock grocery database - in a real implementation, this would be API calls
 MOCK_GROCERY_DATABASE = {
@@ -46,38 +45,6 @@ MOCK_GROCERY_DATABASE = {
 
 # Cart to store items
 shopping_cart = []
-
-def load_context_mapping() -> Dict[str, str]:
-    """Load context mapping from JSON file."""
-    try:
-        if os.path.exists(CONTEXT_FILE_PATH):
-            with open(CONTEXT_FILE_PATH, 'r') as f:
-                return json.load(f)
-        else:
-            # Default context mapping
-            default_context = {
-                "milk": "1% milk",
-                "butter": "unsalted butter",
-                "cheese": "cheddar cheese",
-                "yogurt": "plain greek yogurt",
-                "chicken": "boneless skinless chicken breast",
-                "ground beef": "80/20 ground beef",
-                "rice": "white rice",
-                "pasta": "spaghetti pasta",
-                "oil": "olive oil",
-                "salt": "table salt"
-            }
-            # Create the file with default values
-            with open(CONTEXT_FILE_PATH, 'w') as f:
-                json.dump(default_context, f, indent=2)
-            return default_context
-    except Exception as e:
-        print(f"Error loading context mapping: {e}")
-        return {}
-
-def apply_context(item: str, context_mapping: Dict[str, str]) -> str:
-    """Apply context mapping to transform generic item names to specific ones."""
-    return context_mapping.get(item.lower(), item)
 
 def search_products(query: str) -> List[Dict[str, Any]]:
     """Search for products in the mock database."""
@@ -120,18 +87,14 @@ def search_grocery_items(items: List[str]) -> str:
         JSON string containing search results for each item
     """
     try:
-        context_mapping = load_context_mapping()
         results = {}
         
         for item in items:
-            # Apply context mapping
-            specific_item = apply_context(item, context_mapping)
-            
-            # Search for products
-            products = search_products(specific_item)
+            # Search for products using the item name directly
+            products = search_products(item)
             
             results[item] = {
-                "search_term": specific_item,
+                "search_term": item,
                 "products_found": len(products),
                 "products": products[:5]  # Limit to top 5 results
             }
@@ -237,48 +200,6 @@ def clear_cart() -> str:
             "message": f"Cleared {items_removed} items from cart",
             "cart": []
         })
-        
-    except Exception as e:
-        return json.dumps({"error": str(e)})
-
-@mcp.tool()
-def update_context_mapping(item: str, specific_description: str) -> str:
-    """
-    Update the context mapping for grocery items.
-    
-    Args:
-        item: Generic item name (e.g., "milk")
-        specific_description: Specific description (e.g., "1% milk")
-        
-    Returns:
-        JSON string confirming the update
-    """
-    try:
-        context_mapping = load_context_mapping()
-        context_mapping[item.lower()] = specific_description
-        
-        with open(CONTEXT_FILE_PATH, 'w') as f:
-            json.dump(context_mapping, f, indent=2)
-        
-        return json.dumps({
-            "success": True,
-            "message": f"Updated context mapping: '{item}' -> '{specific_description}'"
-        })
-        
-    except Exception as e:
-        return json.dumps({"error": str(e)})
-
-@mcp.tool()
-def view_context_mapping() -> str:
-    """
-    View current context mapping for grocery items.
-    
-    Returns:
-        JSON string containing all context mappings
-    """
-    try:
-        context_mapping = load_context_mapping()
-        return json.dumps(context_mapping, indent=2)
         
     except Exception as e:
         return json.dumps({"error": str(e)})

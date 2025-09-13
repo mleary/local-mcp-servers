@@ -11,12 +11,11 @@ This is an exploration of MCP and figuring out how to incorporate it into my loc
 
 ![MCP Fantasy Draft Example](./mcp-fantasy-draft/assets/mcp-fantasy-example.png)
 
-**Kroger MCP:** A local MCP server for grocery shopping with context mapping. Features include searching for items, managing a shopping cart, and automatically mapping generic items (like "milk") to specific preferences (like "1% milk").
+**Kroger MCP:** A local MCP server for grocery shopping. Features include searching for items and managing a shopping cart.
 
 ## Key Features of Kroger MCP
-- **Smart Search**: Search grocery items with context mapping
+- **Smart Search**: Search grocery items
 - **Shopping Cart**: Add, view, and manage cart items
-- **Context Mapping**: Customize item preferences (e.g., "milk" → "1% milk")
 - **Store Configuration**: Configurable store settings
 - **Mock Implementation**: Ready for iterative development
 
