@@ -1,0 +1,3 @@
+mcp[cli]==1.13.1
+python-dotenv==1.1.1
+fastmcp==2.11.3
