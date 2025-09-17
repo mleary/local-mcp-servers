@@ -1,4 +1,5 @@
-import os 
+import os
+import json
 
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
@@ -13,7 +14,7 @@ mcp = FastMCP(
 # Load environment variables from .env file
 load_dotenv()
 
-load_and_validate_env(["KROGER_CLIENT_ID", "KROGER_CLIENT_SECRET", "KROGER_REDIRECT_URI"])
+#load_and_validate_env(["KROGER_CLIENT_ID", "KROGER_CLIENT_SECRET", "KROGER_REDIRECT_URI"])
 
 # Initialize KrogerAPI client
 kroger = KrogerAPI()
@@ -41,12 +42,47 @@ else:
     token_info = kroger.authorization.get_token_with_client_credentials("product.compact")
     print("New token obtained")
 
-
-
-### testing 
-
-products = kroger.product.search_products(
-            term="1% milk",
+@mcp.tool()
+def search_for_product(search_query: str) -> str:
+    products = kroger.product.search_products(
+            term=search_query,
             location_id=os.getenv("KROGER_STORE_ID"),
             limit=5
             )
+    # Build a JSON-friendly summary of results
+    items = []
+    for product in products.get("data", []):
+        description = product.get("description", "Unknown")
+        brand = product.get("brand", "N/A")
+        upc = product.get("upc")
+
+        size_val = None
+        regular = None
+        promo = None
+        if "items" in product and product["items"]:
+            first_item = product["items"][0]
+            size_val = first_item.get("size")
+            price = first_item.get("price") or {}
+            regular = price.get("regular")
+            promo = price.get("promo")
+
+        items.append({
+            "description": description,
+            "brand": brand,
+            "upc": upc,
+            "size": size_val,
+            "price": {
+                "regular": regular,
+                "promo": promo
+            }
+        })
+
+    return json.dumps({"items": items})
+
+
+
+# products = kroger.product.search_products(
+#             term="1% milk",
+#             location_id=os.getenv("KROGER_STORE_ID"),
+#             limit=5
+#             )
