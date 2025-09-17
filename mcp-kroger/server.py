@@ -7,6 +7,8 @@ from kroger_api import KrogerAPI
 from kroger_api.token_storage import load_token, save_token
 from kroger_api.utils.env import load_and_validate_env
 
+from utils.product_search import clean_product_search
+
 mcp = FastMCP(
     name='kroger-api'
 )
@@ -43,46 +45,12 @@ else:
     print("New token obtained")
 
 @mcp.tool()
-def search_for_product(search_query: str) -> str:
+def product_search_tool(query: str, limit: int = 5) -> str:
+    """Search for products using the Kroger API based on user query.Defaults to returning top 5 results.  Results are a JSON string with details such as description, brand, upc, size, and price."""
     products = kroger.product.search_products(
-            term=search_query,
-            location_id=os.getenv("KROGER_STORE_ID"),
-            limit=5
-            )
-    # Build a JSON-friendly summary of results
-    items = []
-    for product in products.get("data", []):
-        description = product.get("description", "Unknown")
-        brand = product.get("brand", "N/A")
-        upc = product.get("upc")
+        term=query,
+        location_id=os.getenv("KROGER_STORE_ID"),
+        limit=limit
+    )
+    return clean_product_search(products)
 
-        size_val = None
-        regular = None
-        promo = None
-        if "items" in product and product["items"]:
-            first_item = product["items"][0]
-            size_val = first_item.get("size")
-            price = first_item.get("price") or {}
-            regular = price.get("regular")
-            promo = price.get("promo")
-
-        items.append({
-            "description": description,
-            "brand": brand,
-            "upc": upc,
-            "size": size_val,
-            "price": {
-                "regular": regular,
-                "promo": promo
-            }
-        })
-
-    return json.dumps({"items": items})
-
-
-
-# products = kroger.product.search_products(
-#             term="1% milk",
-#             location_id=os.getenv("KROGER_STORE_ID"),
-#             limit=5
-#             )
