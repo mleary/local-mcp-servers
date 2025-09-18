@@ -11,9 +11,11 @@ This is an exploration of MCP and figuring out how to incorporate it into my loc
 
 ![MCP Fantasy Draft Example](./mcp-fantasy-draft/assets/mcp-fantasy-example.png)
 
-## Future projects
+## In flight projects
 
 **Kroger MCP:** Implement a local MCP server for Kroger's API to assist with grocery shopping.
+
+![Kroger API Example](./mcp-kroger/assets/mcp-kroger-example.png)
 
 ## Structure
 
