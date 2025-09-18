@@ -2,7 +2,7 @@ import json
 
 
 def clean_product_search(search_result):
-    """Cleans and formats the product search results from Kroger API call. Simle framework for now, that could break with API changes.
+    """Cleans and formats the product search results from Kroger API call. Simple framework for now, that could break with API changes.
     """
     try:
         # Expect a dict with top-level "data" list from the Kroger API
@@ -44,5 +44,5 @@ def clean_product_search(search_result):
 
         return json.dumps({"items": items})
     except Exception as e:
-        print(f"See error, API might changed: {e}")
+        print(f"See error, API might have changed: {e}")
         return json.dumps({"items": []})

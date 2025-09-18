@@ -69,5 +69,5 @@ A simple MCP server for Kroger product search and grocery tools. This subdirecto
 - **Token expired**: Run `python utils/auth.py` again.
 
 ## TODO
-* this is based functionality, need to add ability to put items in cart
+* this is basic functionality, need to add ability to put items in cart
 * Improve documentation and error handling
