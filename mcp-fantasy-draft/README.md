@@ -28,11 +28,18 @@ A simple MCP server for Yahoo Fantasy Football tools. Also, my first MCP server 
 
   > **Note:** You will need to go to the [Yahoo Developer Portal](https://developer.yahoo.com/apps/) and set up an application to obtain your client ID and client secret before running the next step.
 
+Create a file `oauth2.json` (added to local .gitignore already) with the following structure:
+
+```json
+   {
+    "consumer_key": "my_very_long_and_weird_consumer_key",
+    "consumer_secret": "my_not_that_long_consumer_secret"}
+```
   Run:
   ```sh
   python auth_setup.py
   ```
-  This creates `oauth2.json` (added to local .gitignore).
+  This updates your  `oauth2.json` with refresh tokens so you don't have to authenticate every time.
 
 3. **Configure Environment**  
    - Copy `.env.example` to `.env`

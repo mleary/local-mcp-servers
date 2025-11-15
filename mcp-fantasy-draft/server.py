@@ -50,25 +50,43 @@ def get_my_team_roster(team_id: str = team_id) -> str:
     except Exception as e:
         return json.dumps({"error": f"Error fetching team roster: {e}"})
 
-
 @mcp.tool()
-def get_drafted_players(league_id: str = league_id) -> str:
-    """Checks Yahoo Fantasy API to see what players have been drafted in a specific league."""
+def get_free_agents(league_id: str = league_id, position: str = "QB") -> str:
+    """Checks Yahoo Fantasy API to see what players are available as free agents in a specific league."""
     try:
         league = yfl.League(oauth, league_id)
-        drafted_players = league.taken_players()
+        free_agents = league.free_agents(position)
         filtered = [
             {
                 "name": p.get("name", ""),
                 "eligible_positions": p.get("eligible_positions", []),
                 "percent_owned": p.get("percent_owned", None)
             }
-            for p in drafted_players
+            for p in free_agents
             if "name" in p
         ]
         return json.dumps(filtered)
     except Exception as e:
-        return json.dumps({"error": f"Error fetching drafted players: {e}"})
+        return json.dumps({"error": f"Error fetching free agents: {e}"})
+
+# @mcp.tool()
+# def get_drafted_players(league_id: str = league_id) -> str:
+#     """Checks Yahoo Fantasy API to see what players have been drafted in a specific league."""
+#     try:
+#         league = yfl.League(oauth, league_id)
+#         drafted_players = league.taken_players()
+#         filtered = [
+#             {
+#                 "name": p.get("name", ""),
+#                 "eligible_positions": p.get("eligible_positions", []),
+#                 "percent_owned": p.get("percent_owned", None)
+#             }
+#             for p in drafted_players
+#             if "name" in p
+#         ]
+#         return json.dumps(filtered)
+#     except Exception as e:
+#         return json.dumps({"error": f"Error fetching drafted players: {e}"})
 
 
 # run server
