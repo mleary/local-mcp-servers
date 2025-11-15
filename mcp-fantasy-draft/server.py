@@ -30,7 +30,7 @@ if not oauth.token_is_valid():
 # Load league and team IDs from environment variables
 league_id = os.getenv("LEAGUE_ID")
 team_id = os.getenv("TEAM_ID")
-
+valid_positions = ['QB', 'WR', 'RB', 'TE', 'W/R/T', 'Q/W/R/T', 'K', 'DEF', 'D', 'DB', 'LB', 'BN', 'IR']
 
 @mcp.tool()
 def get_my_team_roster(team_id: str = team_id) -> str:
@@ -50,10 +50,13 @@ def get_my_team_roster(team_id: str = team_id) -> str:
     except Exception as e:
         return json.dumps({"error": f"Error fetching team roster: {e}"})
 
+
 @mcp.tool()
 def get_free_agents(league_id: str = league_id, position: str = "QB") -> str:
-    """Checks Yahoo Fantasy API to see what players are available as free agents in a specific league."""
+    """Checks Yahoo Fantasy API to see what players are available as free agents in a specific league. Valid positions are ['QB', 'WR', 'RB', 'TE', 'W/R/T', 'Q/W/R/T', 'K', 'DEF', 'D', 'DB', 'LB', 'BN', 'IR'] """
     try:
+        if position not in valid_positions:
+            return json.dumps({"error": f"Invalid position '{position}'. Valid options are {valid_positions}."})
         league = yfl.League(oauth, league_id)
         free_agents = league.free_agents(position)
         filtered = [
