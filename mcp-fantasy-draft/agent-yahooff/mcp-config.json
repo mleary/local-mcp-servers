@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "yahoo-fantasy": {
+      "command": "python",
+      "args": ["server.py"],
+      "cwd": "/Users/matt/local-mcp-servers/mcp-fantasy-draft/agent-yahooff",
+      "env": {}
+    }
+  }
+}

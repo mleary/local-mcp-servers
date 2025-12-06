@@ -1,0 +1,25 @@
+# Environment variables
+.env
+
+# Virtual environments
+.venv
+venv/
+ENV/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# OAuth credentials (sensitive)
+oauth2.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store

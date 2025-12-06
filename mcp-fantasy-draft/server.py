@@ -55,8 +55,8 @@ def get_my_team_roster(team_id: str = team_id) -> str:
 def get_free_agents(league_id: str = league_id, position: str = "QB") -> str:
     """Checks Yahoo Fantasy API to see what players are available as free agents in a specific league. Valid positions are ['QB', 'WR', 'RB', 'TE', 'W/R/T', 'Q/W/R/T', 'K', 'DEF', 'D', 'DB', 'LB', 'BN', 'IR'] """
     try:
-        if position not in valid_positions:
-            return json.dumps({"error": f"Invalid position '{position}'. Valid options are {valid_positions}."})
+        # if position not in valid_positions:
+        #     return json.dumps({"error": f"Invalid position '{position}'. Valid options are {valid_positions}."})
         league = yfl.League(oauth, league_id)
         free_agents = league.free_agents(position)
         filtered = [
