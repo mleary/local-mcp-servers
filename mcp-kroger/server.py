@@ -1,10 +1,10 @@
 import os
-import sys
 import json
+from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
-from kroger_api.token_storage import load_token
+import kroger_api.token_storage as token_storage
 
 # Import your new MCP-compatible wrapper
 from utils.kroger_mcp_api import MCPKrogerAPI
@@ -34,6 +34,35 @@ except Exception as e:
 
 # Access the actual API through the wrapper
 kroger = kroger_wrapper.api
+
+DEFAULT_USER_TOKEN_FILENAME = ".kroger_token_user.json"
+
+
+def _token_file_candidates():
+    """Ordered list of places to look for the user token file."""
+    env_path = os.getenv("KROGER_USER_TOKEN_FILE")
+    repo_root = Path(__file__).resolve().parent
+
+    candidates = []
+    if env_path:
+        candidates.append(Path(env_path).expanduser())
+
+    candidates.extend([
+        repo_root / DEFAULT_USER_TOKEN_FILENAME,
+        Path.cwd() / DEFAULT_USER_TOKEN_FILENAME,
+        kroger_wrapper.token_dir / DEFAULT_USER_TOKEN_FILENAME,
+    ])
+
+    return candidates
+
+
+def _resolve_user_token_file():
+    """Pick the first existing token path, or fall back to the highest-priority guess."""
+    candidates = _token_file_candidates()
+    for path in candidates:
+        if path.is_file():
+            return path
+    return candidates[0] if candidates else Path.cwd() / DEFAULT_USER_TOKEN_FILENAME
 
 @mcp.tool()
 def product_search_tool(query: str, limit: int = 5) -> str:
@@ -90,15 +119,16 @@ def add_to_cart_tool(upc: str, quantity: int = 1, modality: str = "PICKUP", loca
         return json.dumps({"error": "Missing location_id and KROGER_STORE_ID is not set."})
 
     # Load user token for cart operations
-    token_file = os.getenv("KROGER_USER_TOKEN_FILE", ".kroger_token_user.json")
-    user_token = load_token(token_file)
+    token_path = _resolve_user_token_file()
+    user_token = token_storage.load_token(str(token_path))
     if not user_token:
         return json.dumps({
             "error": "User token not found. Run `python utils/auth.py` to authorize with cart.basic:write.",
-            "token_file": token_file
+            "token_file": str(token_path),
+            "searched_paths": [str(p) for p in _token_file_candidates()]
         })
 
-    kroger.client.token_file = token_file
+    kroger.client.token_file = str(token_path)
     kroger.client.token_info = user_token
 
     payload_items = [{
@@ -125,7 +155,7 @@ def add_to_cart_tool(upc: str, quantity: int = 1, modality: str = "PICKUP", loca
         if refresh_token:
             try:
                 kroger.authorization.refresh_token(refresh_token)
-                kroger.client.token_info = load_token(token_file) or kroger.client.token_info
+                kroger.client.token_info = token_storage.load_token(str(token_path)) or kroger.client.token_info
                 _attempt_add()
                 return json.dumps({
                     "status": "success",

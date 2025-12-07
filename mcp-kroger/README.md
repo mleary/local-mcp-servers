@@ -3,12 +3,24 @@
 
 A simple MCP server for Kroger product search and grocery tools. This subdirectory contains the MCP server code for interacting with Kroger's API, designed to be used as a backend for local MCP workflows or with compatible front-end clients.
 
-![MCP Kroger Example Screenshot](assets/mcp-kroger-example.png)
+At this point, I am connecting these tools to Claude Desktop for local use.
 
-* Screenshot from a sample product search.
+## TODO
+There are more details below on features and setup, but I still have work I want to do.
+
+* Can I add step in MCP to let Claude Desktop refresh token? 
+	* I've run into issues with this that I can fix manually, but ideally that process is smoother.
+* Improve documentation and error handling
+* Add ability to schedule? Might not be worth it, scheduling isn't that difficult.
 
 ## Features
-- `search_products(query)`: Search for products by keyword.
+- `search_products`: Search for products by keyword.
+
+![MCP Kroger Example Screenshot](assets/mcp-kroger-example-search.png)
+
+- `add_to_cart_tool`: Add products to your Kroger cart by product ID and quantity.
+
+![MCP ](assets/mcp-kroger-example-cart.png)
 
 
 ## Requirements
@@ -35,7 +47,8 @@ A simple MCP server for Kroger product search and grocery tools. This subdirecto
 	- Set your values for:
 	  - `KROGER_CLIENT_ID=your_client_id`
 	  - `KROGER_CLIENT_SECRET=your_client_secret`
-	  - `ZIP_CODE=your_zip_code`
+		- `ZIP_CODE=your_zip_code`
+		- `KROGER_USER_TOKEN_FILE=/absolute/path/to/.kroger_token_user.json` (optional; recommended for Claude Desktop so the token file is always found)
 
 4. **Install Dependencies**  
 	- Preferred:
@@ -68,6 +81,3 @@ A simple MCP server for Kroger product search and grocery tools. This subdirecto
 - **Missing credentials**: Check `.env` and your credentials file.
 - **Token expired**: Run `python utils/auth.py` again.
 
-## TODO
-* this is basic functionality, need to add ability to put items in cart
-* Improve documentation and error handling
