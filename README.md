@@ -15,7 +15,7 @@ This is an exploration of MCP and figuring out how to incorporate it into my loc
 
 **Kroger MCP:** Implement a local MCP server for Kroger's API to assist with grocery shopping.
 
-![Kroger API Example](./mcp-kroger/assets/mcp-kroger-example.png)
+![Kroger API Example](./mcp-kroger/assets/mcp-kroger-example-cart.png)
 
 ## Structure
 
