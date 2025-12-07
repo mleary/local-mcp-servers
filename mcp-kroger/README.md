@@ -1,14 +1,19 @@
 
 ## mcp-kroger
 
-A simple MCP server for Kroger product search and grocery tools. This subdirectory contains the MCP server code for interacting with Kroger's API, designed to be used as a backend for local MCP workflows or with compatible front-end clients.
+A dual-mode Kroger toolkit with a shared Python core. It exposes:
+
+- An MCP server for Claude Desktop (auto-discovers tools).
+- A CLI wrapper (`kroger` command) suitable for Copilot CLI or shell scripting.
 
 ![MCP Kroger Example Screenshot](assets/mcp-kroger-example.png)
 
 * Screenshot from a sample product search.
 
 ## Features
-- `search_products(query)`: Search for products by keyword.
+- Shared core service for Kroger auth, search, and cart operations.
+- `kroger` CLI: `kroger search "milk" --json` and `kroger cart add --upc ... --qty ...`.
+- MCP server (`python server.py`) with tools for product search and add-to-cart.
 
 
 ## Requirements
@@ -21,14 +26,14 @@ A simple MCP server for Kroger product search and grocery tools. This subdirecto
 1. **Install Python 3.12**  
 	(Check `.python-version` for the required version.)
 
-2. **Set up Kroger API Credentials**  
-	> **Note:** You will need to register for Kroger API access and obtain your client ID and client secret. Store credentials securely and do not commit them.
+2. **Set up Kroger API Credentials**
+        > **Note:** You will need to register for Kroger API access and obtain your client ID and client secret. Store credentials securely and do not commit them.
 
-	Run:
-	```sh
-	python utils/auth.py
-	```
-	This creates your local credentials file (should be .gitignored).
+        Run:
+        ```sh
+        python utils/auth.py
+        ```
+        This stores tokens under `$XDG_CONFIG_HOME/kroger/` (or `~/.config/kroger/`) for reuse by both MCP and CLI.
 
 3. **Configure Environment**  
 	- Copy `.env.example` to `.env` (if provided)
@@ -37,20 +42,28 @@ A simple MCP server for Kroger product search and grocery tools. This subdirecto
 	  - `KROGER_CLIENT_SECRET=your_client_secret`
 	  - `ZIP_CODE=your_zip_code`
 
-4. **Install Dependencies**  
-	- Preferred:
-	  ```sh
-	  uv sync
-	  ```
-	- Or fallback:
-	  ```sh
-	  pip install -r requirements.txt
-	  ```
+4. **Install Dependencies**
+        - Preferred (if uv is available):
+          ```sh
+          uv sync
+          ```
+        - Or fallback:
+          ```sh
+          pip install -r requirements.txt
+          ```
 
-5. **Run the Server**  
-	```sh
-	python server.py
-	```
+5. **Run the MCP Server**
+        ```sh
+        python server.py
+        ```
+
+6. **Use the CLI (Copilot/Shell Friendly)**
+        ```sh
+        PYTHONPATH=src python -m kroger_cli search "milk" --limit 3 --json
+        PYTHONPATH=src python -m kroger_cli cart add --upc 000000000 --quantity 1
+        ```
+        The CLI powers Copilot CLI tool calls (e.g., `uv run kroger search "milk" --json`). Installing the package (`pip inst
+        all -e .`) also exposes the `kroger` console script.
 
 ## Configuration
 - API credentials and zip code are set in your `.env` file.
@@ -58,10 +71,10 @@ A simple MCP server for Kroger product search and grocery tools. This subdirecto
 
 
 ## Project Files
-- `server.py`: Main server
-- `utils/auth.py`: Kroger API authentication helper
-- `utils/product_search.py`: Product search logic
-- `utils/kroger_mcp_api.py`: Kroger MCP API integration
+- `server.py`: MCP server entrypoint reusing the shared Kroger core.
+- `src/kroger_core/`: Shared service + formatting utilities.
+- `src/kroger_cli/`: Typer-powered CLI wrappers (Copilot-friendly).
+- `utils/auth.py`: Kroger API authentication helper (writes tokens to config dir).
 - `.env.example`: Example env file (if present)
 
 ## Troubleshooting
@@ -69,5 +82,5 @@ A simple MCP server for Kroger product search and grocery tools. This subdirecto
 - **Token expired**: Run `python utils/auth.py` again.
 
 ## TODO
-* this is basic functionality, need to add ability to put items in cart
-* Improve documentation and error handling
+* Expand CLI coverage (cart review, store lookup).
+* Improve documentation and error handling.
