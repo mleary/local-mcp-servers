@@ -41,9 +41,19 @@ class MCPKrogerAPI:
         # Override load_token function  
         original_load = token_storage.load_token
         def load_token_wrapper(token_file):
+            path_obj = Path(token_file).expanduser()
+
+            # 1) Respect explicit absolute paths (e.g., when provided via env var or resolved in server)
+            try:
+                if path_obj.is_absolute() and path_obj.exists():
+                    with open(path_obj, 'r') as f:
+                        return json.load(f)
+            except Exception:
+                pass
+
             try:
                 # Try to load from temp directory first
-                temp_path = self.token_dir / Path(token_file).name
+                temp_path = self.token_dir / path_obj.name
                 if temp_path.exists():
                     with open(temp_path, 'r') as f:
                         return json.load(f)
@@ -53,6 +63,12 @@ class MCPKrogerAPI:
             # Fall back to memory storage
             if token_file in self.tokens:
                 return self.tokens[token_file]
+
+            # 4) Last chance: original loader (covers relative paths in cwd)
+            try:
+                return original_load(token_file)
+            except Exception:
+                pass
             
             # Return None if not found
             return None

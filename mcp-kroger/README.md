@@ -35,7 +35,8 @@ A simple MCP server for Kroger product search and grocery tools. This subdirecto
 	- Set your values for:
 	  - `KROGER_CLIENT_ID=your_client_id`
 	  - `KROGER_CLIENT_SECRET=your_client_secret`
-	  - `ZIP_CODE=your_zip_code`
+		- `ZIP_CODE=your_zip_code`
+		- `KROGER_USER_TOKEN_FILE=/absolute/path/to/.kroger_token_user.json` (optional; recommended for Claude Desktop so the token file is always found)
 
 4. **Install Dependencies**  
 	- Preferred:
@@ -69,5 +70,5 @@ A simple MCP server for Kroger product search and grocery tools. This subdirecto
 - **Token expired**: Run `python utils/auth.py` again.
 
 ## TODO
-* this is basic functionality, need to add ability to put items in cart
+* Can I add step in MCP to let Claude Desktop refresh token?
 * Improve documentation and error handling
