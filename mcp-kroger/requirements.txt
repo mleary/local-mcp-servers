@@ -1,6 +1,7 @@
-# Generated from uv.lock on 2025-09-14. Do not edit manually.
-# To update: run `uv pip compile pyproject.toml > requirements.txt` (or appropriate uv export command once available).
+# Locked offline based on pyproject; uv compile unavailable in this environment.
 kroger-api==0.2.0
 python-dotenv==1.1.1
 requests==2.32.5
-
+typer==0.12.5
+click==8.1.7
+typing-extensions==4.12.2
