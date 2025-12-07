@@ -1,6 +1,7 @@
 # Generated from uv.lock on 2025-09-14. Do not edit manually.
 # To update: run `uv pip compile pyproject.toml > requirements.txt` (or appropriate uv export command once available).
 kroger-api==0.2.0
+mcp==1.13.1
 python-dotenv==1.1.1
 requests==2.32.5
 
