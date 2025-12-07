@@ -4,6 +4,7 @@ import json
 
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
+from kroger_api.token_storage import load_token
 
 # Import your new MCP-compatible wrapper
 from utils.kroger_mcp_api import MCPKrogerAPI
@@ -62,6 +63,86 @@ def product_search_tool(query: str, limit: int = 5) -> str:
                 "query": query
             })
 
+@mcp.tool()
+def add_to_cart_tool(upc: str, quantity: int = 1, modality: str = "PICKUP", location_id: str = None) -> str:
+    """Add an item to the authenticated user's Kroger cart. Requires prior user auth (cart.basic:write)."""
+    # Basic validation
+    if not upc or not isinstance(upc, str):
+        return json.dumps({"error": "Invalid UPC provided.", "upc": upc})
+    try:
+        qty_int = int(quantity)
+    except Exception:
+        return json.dumps({"error": "Quantity must be an integer.", "quantity": quantity})
+    if qty_int < 1:
+        return json.dumps({"error": "Quantity must be at least 1.", "quantity": quantity})
+    
+    modality_clean = (modality or "").strip().upper()
+    allowed_modalities = {"PICKUP", "DELIVERY"}
+    if modality_clean not in allowed_modalities:
+        return json.dumps({
+            "error": "Invalid modality. Use PICKUP or DELIVERY.",
+            "modality": modality
+        })
+
+    # Location: prefer env (consistent with product search), fallback to provided location_id
+    resolved_location = os.getenv("KROGER_STORE_ID") or location_id
+    if not resolved_location:
+        return json.dumps({"error": "Missing location_id and KROGER_STORE_ID is not set."})
+
+    # Load user token for cart operations
+    token_file = os.getenv("KROGER_USER_TOKEN_FILE", ".kroger_token_user.json")
+    user_token = load_token(token_file)
+    if not user_token:
+        return json.dumps({
+            "error": "User token not found. Run `python utils/auth.py` to authorize with cart.basic:write.",
+            "token_file": token_file
+        })
+
+    kroger.client.token_file = token_file
+    kroger.client.token_info = user_token
+
+    payload_items = [{
+        "upc": upc,
+        "quantity": qty_int,
+        "modality": modality_clean
+    }]
+
+    def _attempt_add():
+        return kroger.cart.add_to_cart(payload_items)
+
+    try:
+        _attempt_add()
+        return json.dumps({
+            "status": "success",
+            "upc": upc,
+            "quantity": qty_int,
+            "modality": modality_clean,
+            "location_id": resolved_location
+        })
+    except Exception as e:
+        # Attempt token refresh once if possible
+        refresh_token = user_token.get("refresh_token") if isinstance(user_token, dict) else None
+        if refresh_token:
+            try:
+                kroger.authorization.refresh_token(refresh_token)
+                kroger.client.token_info = load_token(token_file) or kroger.client.token_info
+                _attempt_add()
+                return json.dumps({
+                    "status": "success",
+                    "upc": upc,
+                    "quantity": qty_int,
+                    "modality": modality_clean,
+                    "location_id": resolved_location,
+                    "note": "Token was refreshed before adding to cart."
+                })
+            except Exception as retry_error:
+                return json.dumps({
+                    "error": f"Failed to add to cart after refresh: {retry_error}",
+                    "details": str(e)
+                })
+        return json.dumps({
+            "error": f"Failed to add to cart: {e}"
+        })
 
 # Start the server
 if __name__ == "__main__":
